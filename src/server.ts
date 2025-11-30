@@ -8,6 +8,9 @@ dotenv.config({path:path.join(process.cwd(), '.env') })
 const app = express()
 const port = 5000
 
+//parser
+app.use(express.json());
+
 const pool = new Pool({
   connectionString:`${process.env.CONNECTION_STR}`
 })
@@ -44,6 +47,26 @@ initDB()
 app.get('/', (req: Request, res: Response) => {
   res.send('Hello World! I am a typescript server')
 })
+
+app.post('/users', async (req: Request, res: Response) =>{
+  const {name , email} = req.body;
+  try{
+      const result = await pool.query(
+        `INSERT INTO users(name,email) VALUES($1,$2) RETURNING *;`, 
+      [name , email]);
+      console.log(result.rows[0]);
+      res.status(201).send({
+        success: true,
+        message: "Data Instered Successfully",
+        data: result.rows[0]
+      })
+  }catch(err:any){
+    res.status(500).send({
+      succes: false,
+      message: err.message
+    })
+  }
+});
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)
