@@ -159,6 +159,44 @@ app.delete('/users/:id', async (req:Request, res:Response) => {
        }
 })
 
+// curd operation for todos
+app.post('/todos', async(req:Request, res:Response) => {
+     const {user_id , title , description , completed , due_date} = req.body;
+   try{
+      const result = await pool.query(`INSERT INTO todos(user_id,title,description,completed,due_date) VALUES($1,$2,$3,$4,$5) RETURNING *;`, [user_id , title , description , completed , due_date]);
+      // console.log(result.rows[0]);
+      res.status(201).json({
+        success: true,
+        message: "Data Instered Successfully",
+        data: result.rows[0]
+      })
+   }catch(err:any){
+    res.status(500).json({
+      success: false,
+      message: err.message
+    })
+   }
+})
+
+//get all todos
+app.get("/todos", async (req: Request, res: Response) => {
+  try {
+    const result = await pool.query(`SELECT * FROM todos`);
+
+    res.status(200).json({
+      success: true,
+      message: "todos retrieved successfully",
+      data: result.rows,
+    });
+  } catch (err: any) {
+    res.status(500).json({
+      success: false,
+      message: err.message,
+      datails: err,
+    });
+  }
+});
+
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)
 })
