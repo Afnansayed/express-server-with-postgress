@@ -1,4 +1,4 @@
-import express, { Request, Response } from 'express';
+import express, { NextFunction, Request, Response } from 'express';
 import {Pool} from 'pg';
 import dotenv from 'dotenv';
 import path from 'path';
@@ -44,11 +44,16 @@ const initDB = async() => {
 
 initDB()
 
+const loger = (req: Request , res: Response , next:NextFunction) => {
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.path}`);
+  next();
+}
+
 app.get('/', (req: Request, res: Response) => {
   res.send('Hello World! I am a typescript server')
 })
 
-app.post('/users', async (req: Request, res: Response) =>{
+app.post('/users', async  (req: Request, res: Response) =>{
   const {name , email} = req.body;
   try{
       const result = await pool.query(
@@ -68,7 +73,7 @@ app.post('/users', async (req: Request, res: Response) =>{
   }
 });
 
-app.get('/users', async (req:Request, res:Response) => {
+app.get('/users', loger, async (req:Request, res:Response) => {
   try{
     const result = await pool.query(`SELECT * FROM users`);
     res.status(200).json({
@@ -196,6 +201,14 @@ app.get("/todos", async (req: Request, res: Response) => {
     });
   }
 });
+
+app.use((req, res) => {
+  res.status(404).json({
+    success: false,
+    message: "Page Not Found",
+    path: req.path
+  })
+})
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)
