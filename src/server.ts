@@ -1,6 +1,7 @@
 import express, { NextFunction, Request, Response } from 'express';
 import config from './config';
 import initDB, { pool } from './config/db';
+import loger from './middleware/logger';
 
 
 
@@ -15,10 +16,7 @@ app.use(express.json());
 
 initDB();
 
-const loger = (req: Request , res: Response , next:NextFunction) => {
-  console.log(`[${new Date().toISOString()}] ${req.method} ${req.path}`);
-  next();
-}
+
 
 app.get('/', (req: Request, res: Response) => {
   res.send('Hello World! I am a typescript server')
