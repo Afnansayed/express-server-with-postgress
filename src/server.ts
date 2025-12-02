@@ -1,7 +1,8 @@
-import express, { NextFunction, Request, Response } from 'express';
+import express, { Request, Response } from 'express';
 import config from './config';
 import initDB, { pool } from './config/db';
 import loger from './middleware/logger';
+import { userRouter } from './modules/user/user.routes';
 
 
 
@@ -11,9 +12,6 @@ const port = config.port;
 
 //parser
 app.use(express.json());
-
-
-
 initDB();
 
 
@@ -22,25 +20,7 @@ app.get('/', (req: Request, res: Response) => {
   res.send('Hello World! I am a typescript server')
 })
 
-app.post('/users', async  (req: Request, res: Response) =>{
-  const {name , email} = req.body;
-  try{
-      const result = await pool.query(
-        `INSERT INTO users(name,email) VALUES($1,$2) RETURNING *;`, 
-      [name , email]);
-      console.log(result.rows[0]);
-      res.status(201).send({
-        success: true,
-        message: "Data Instered Successfully",
-        data: result.rows[0]
-      })
-  }catch(err:any){
-    res.status(500).send({
-      succes: false,
-      message: err.message
-    })
-  }
-});
+app.use('/users', userRouter);
 
 app.get('/users', loger, async (req:Request, res:Response) => {
   try{
