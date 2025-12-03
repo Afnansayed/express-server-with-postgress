@@ -13,7 +13,8 @@ const auth = (...routes: string[]) => {
         token,
         config.jwtSecret as string
       ) as JwtPayload;
-      console.log({ decodedToken });
+      req.user = decodedToken;
+      //   console.log({ decodedToken });
       if (routes.length && !routes.includes(decodedToken.role)) {
         return res.status(403).json({ message: 'Forbidden' });
       }

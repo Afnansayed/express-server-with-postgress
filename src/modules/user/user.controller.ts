@@ -2,24 +2,24 @@ import { Request, Response } from 'express';
 import { userService } from './user.service';
 
 const createUser = async (req: Request, res: Response) => {
-
   try {
     const result = await userService.createUser(req.body);
     //   console.log(result.rows[0]);
     res.status(201).send({
       success: true,
-      message: 'Data Instered Successfully',
+      message: 'Data Inserted Successfully',
       data: result.rows[0],
     });
   } catch (err: any) {
     res.status(500).send({
-      succes: false,
+      success: false,
       message: err.message,
     });
   }
 };
 
 const getUsers = async (req: Request, res: Response) => {
+  // console.log(req.user, '`````````````````');
   try {
     const result = await userService.getUsers();
     res.status(200).json({
