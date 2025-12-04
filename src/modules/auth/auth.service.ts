@@ -18,3 +18,4 @@ const loginUser = async (paload: Record<string, unknown>) => {
 export const authService = {
     loginUser
 }
+
